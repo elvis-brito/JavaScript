@@ -16,6 +16,7 @@ class CalcController {
         setInterval(() => {
             this.setDisplayDateTime();
         }, 1000);
+        this.setLastNumberToDisplay();
     }
 
     addEventListenerAll(element, events, fn) {
@@ -26,10 +27,12 @@ class CalcController {
 
     allClear() {
         this._operation = [];
+        this.setLastNumberToDisplay();
     }
 
     clearEntry() {
         this._operation.pop();
+        this.setLastNumberToDisplay();
     }
 
     setLastOperation(value){
@@ -65,6 +68,7 @@ class CalcController {
             }
         }
 
+        if (!lastNumber) lastNumber = 0;
         this.displayCalc = lastNumber;
     }
 
