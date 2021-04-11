@@ -1,5 +1,7 @@
 class CalcController {
     constructor() {
+        this._audio = new Audio('click.mp3');
+        this._audioOnOff = false;
         this._lastOperator = '';
         this._lastNumber = '';
         this._operation = [];
@@ -21,10 +23,31 @@ class CalcController {
         }, 1000);
         this.setLastNumberToDisplay();
         this.pastFromClipboard();
+
+        document.querySelectorAll(".btn-ac").forEach(btn => {
+            btn.addEventListener("dblclick", e =>{
+                this.toggleAudio();
+            });
+        });
+
+    }
+
+    toggleAudio(){
+        this._audioOnOff = !this._audioOnOff; 
+    }
+
+    playAudio(){
+        if (this._audioOnOff){
+            this._audio.currentTime = 0;
+            this._audio.play();
+        }
     }
 
     initKeyboard(){
         document.addEventListener('keyup', e=>{
+            
+            this.playAudio();
+            
             switch (e.key) {
                 case 'Escape':
                     this.allClear();
@@ -117,7 +140,13 @@ class CalcController {
     }
 
     getResult() {
-        return eval(this._operation.join(""));
+        try {
+            return eval(this._operation.join(""));
+        } catch (e) {
+            setTimeout(()=>{
+                this.setError();
+            }, 1)
+        }
     }
 
     calc() {
@@ -197,7 +226,7 @@ class CalcController {
     }
 
     setError() {
-        this._displayCalc = "Error";
+        this.displayCalc = "Error";
     }
 
     getLastOperation() {
@@ -218,6 +247,8 @@ class CalcController {
     }
 
     execButton(value) {
+
+        this.playAudio();
 
         switch (value) {
             case 'ac':
@@ -304,11 +335,17 @@ class CalcController {
         return this._timeEl.innerHTML = value;
     }
 
-    get displayCalc() {
+    get displayCalc(){
         return this._displayCalcEl.innerHTML;
     }
 
-    set displayCalc(value) {
+    set displayCalc(value){
+
+        if(value.toString().length > 10){
+            this.setError();
+            return false;
+        }
+
         this._displayCalcEl.innerHTML = value;
     }
 
