@@ -29,6 +29,8 @@ class CalcController {
 
     allClear() {
         this._operation = [];
+        this._lastNumber = '';
+        this._lastOperator = '';
         this.setLastNumberToDisplay();
     }
 
@@ -74,9 +76,6 @@ class CalcController {
             this._lastNumber = this.getLastItem(false);
         }
 
-        console.log('_lastOperator', this._lastOperator);
-        console.log('_lastNumber', this._lastNumber);
-
         let result = this.getResult();
 
         if (last == "%") {
@@ -117,8 +116,6 @@ class CalcController {
         if (isNaN(this.getLastOperation())) {
             if (this.isOperator(value)) {
                 this.setLastOperation(value);
-            } else if (isNaN(value)) {
-                console.log("Outra coisa", value);
             } else {
                 this.pushOperation(value);
                 this.setLastNumberToDisplay();
@@ -129,7 +126,7 @@ class CalcController {
                 this.pushOperation(value);
             } else {
                 let newValue = this.getLastOperation().toString() + value.toString();
-                this.setLastOperation(parseInt(newValue));
+                this.setLastOperation(newValue);
                 this.setLastNumberToDisplay();
             }
 
@@ -144,6 +141,19 @@ class CalcController {
 
     getLastOperation() {
         return this._operation[this._operation.length - 1];
+    }
+
+    addDot(){
+       let lastOperation = this.getLastOperation();
+
+        if(typeof lastOperation === 'string' && lastOperation.split('').indexOf('.') > -1) return;
+
+       if (this.isOperator(lastOperation) || !lastOperation){
+           this.pushOperation("0.");
+       }else{
+           this.setLastOperation(lastOperation.toString() + '.');
+       }
+       this.setLastNumberToDisplay();
     }
 
     execButton(value) {
@@ -171,7 +181,7 @@ class CalcController {
                 this.addOperation('/');
                 break;
             case 'ponto':
-                this.addOperation('.');
+                this.addDot();
                 break;
             case 'igual':
                 this.calc();
